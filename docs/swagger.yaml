@@ -1,0 +1,132 @@
+definitions:
+  entities.Stock:
+    properties:
+      amount:
+        type: integer
+      categoryId:
+        type: integer
+      expireDate:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      userId:
+        type: integer
+    type: object
+  entities.StockCategory:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      userId:
+        type: integer
+    type: object
+  entities.User:
+    properties:
+      id:
+        type: integer
+      mailAddress:
+        type: string
+      name:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /categories:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.StockCategory'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Categoryを全件取得
+      tags:
+      - Category
+  /stocks:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Stock'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Stockを全件取得
+      tags:
+      - Stock
+    post:
+      parameters:
+      - description: Stock
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.Stock'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登録したStock
+          schema:
+            $ref: '#/definitions/entities.Stock'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Stockを1件登録
+      tags:
+      - Stock
+  /stocks/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: idで指定したStockを1件削除する
+      tags:
+      - Stock
+  /users:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Userを全件取得
+      tags:
+      - User
+swagger: "2.0"
