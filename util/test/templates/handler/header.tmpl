@@ -1,0 +1,25 @@
+{{define "header"}}
+{{range .Comments}}{{.}}
+{{end -}}
+package {{.Package}}
+
+import (
+{{range .Imports}}{{.Name}} {{.Path}}
+"github.com/stretchr/testify/mock"
+{{end}}
+)
+
+type MockUsecase struct {
+	mock.Mock
+}
+
+// TODO: implement all the methods of usecase
+// e.g.
+// func (m *MockUsecase) GetAllStocks() ([]*entities.Stock, error) {
+// 	args := m.Called()
+// 	return args.Get(0).([]*entities.Stock), args.Error(1)
+// }
+
+// TODO: remove func TestNewXXXHandler(t *testing.T) ↓↓↓
+
+{{end}}

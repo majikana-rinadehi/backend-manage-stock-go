@@ -7,10 +7,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/go-ozzo/ozzo-validation/v4"
 	_ "github.com/majikana-rinadehi/backend-manage-stock-go/docs"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/entities"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/handlers"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/usecases"
+	"github.com/majikana-rinadehi/backend-manage-stock-go/util"
 )
 
 type StockHandler struct {
@@ -35,10 +37,22 @@ func (h *StockHandler) GetAllStocks(c *gin.Context) *gin.Context {
 	stocks, err := h.stockUsecase.GetAllStocks()
 	if err != nil {
 		fmt.Println("GetAllStocks failed", err)
-		c.JSON(http.StatusInternalServerError, gin.H{})
+		c.JSON(http.StatusInternalServerError, &handlers.Response[*entities.Stock]{
+			Total:   0,
+			Results: nil,
+			Errors: []*handlers.ErrorResponse{
+				{
+					Message: "GetAllStocks failed",
+				},
+			},
+		})
 		return c
 	}
-	c.JSON(http.StatusOK, stocks)
+	c.JSON(http.StatusOK, &handlers.Response[*entities.Stock]{
+		Total:   len(stocks),
+		Results: stocks,
+		Errors:  nil,
+	})
 	return c
 }
 
@@ -55,17 +69,68 @@ func (h *StockHandler) CreateStock(c *gin.Context) *gin.Context {
 	var newStock entities.Stock
 
 	if bindErr := c.BindJSON(&newStock); bindErr != nil {
+		c.JSON(http.StatusBadRequest, &handlers.Response[any]{
+			Total:   0,
+			Results: nil,
+			Errors: []*handlers.ErrorResponse{
+				{
+					Message: bindErr.Error(),
+				},
+			},
+		})
+		return c
+	}
+
+	// リクエストバリデーションチェック
+	vErr := validation.ValidateStruct(&newStock,
+		validation.Field(&newStock.Id,
+			validation.By(util.ValidateIntNotEmpty("id")),
+		),
+		validation.Field(&newStock.UserId,
+			validation.By(util.ValidateIntNotEmpty("userId")),
+		),
+		validation.Field(&newStock.CategoryId,
+			validation.By(util.ValidateIntNotEmpty("categoryId")),
+		),
+		validation.Field(&newStock.Name,
+			validation.By(util.ValidateStrNotEmpty("name")),
+			validation.Length(0, 255).Error(util.MaxLengthErrMsg("name", 255)),
+		),
+		validation.Field(&newStock.Amount,
+			validation.By(util.ValidateIntNotEmpty("amount")),
+		),
+		validation.Field(&newStock.ExpireDate,
+			validation.By(util.ValidateYYYY_MM_DD("expireDate")),
+		),
+	)
+
+	if vErr != nil {
+		handlers.BadRequests(c, vErr.(validation.Errors))
 		return c
 	}
 
 	stock, err := h.stockUsecase.CreateStock(&newStock)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": "bad request"})
+		c.JSON(http.StatusInternalServerError, &handlers.Response[*entities.Stock]{
+			Total:   0,
+			Results: nil,
+			Errors: []*handlers.ErrorResponse{
+				{
+					Message: "CreateStock failed",
+				},
+			},
+		})
 		return c
 	}
 
-	c.JSON(http.StatusOK, stock)
+	c.JSON(http.StatusOK, &handlers.Response[*entities.Stock]{
+		Total: 1,
+		Results: []*entities.Stock{
+			stock,
+		},
+		Errors: nil,
+	})
 	return c
 }
 
@@ -84,7 +149,15 @@ func (h *StockHandler) DeleteStock(c *gin.Context) *gin.Context {
 	err := h.stockUsecase.DeleteStock(id)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"message": "Internal Server Error"})
+		c.JSON(http.StatusInternalServerError, &handlers.Response[any]{
+			Total:   0,
+			Results: nil,
+			Errors: []*handlers.ErrorResponse{
+				{
+					Message: "DeleteStock failed",
+				},
+			},
+		})
 		return c
 	}
 

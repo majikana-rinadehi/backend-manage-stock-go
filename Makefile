@@ -13,10 +13,13 @@ migratedown:
 	go run ./db/main.go down
 
 build:
-	go build -o bin/backend-guchitter-app -v .
+	go build -o bin/backend-manage-stock-go -v .
 
 build-migration:
 	go build -o bin/migration -v ./db
 
-gen-test:
-	gotests -template_dir="util/testUtils/templates/custom"  -w -all $(ARG)
+gen-test-handler:
+	gotests -template_dir="util/test/templates/handler" -w -all "$(ARG)"
+
+gen-test-handler-method:
+	gotests -only=$(ARG) -template_dir="util/test/templates/handler" -w "$(ARG)"
