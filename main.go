@@ -17,7 +17,7 @@ import (
 func main() {
 	// アダプターの取得、DB接続処理
 	a := adapters.NewDatabaseAdapter()
-	connErr := a.Connect()
+	connErr := a.Connect(false)
 	if connErr != nil {
 		log.Fatal()
 	}

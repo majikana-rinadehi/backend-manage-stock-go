@@ -22,4 +22,14 @@ gen-test-handler:
 	gotests -template_dir="util/test/templates/handler" -w -all "$(ARG)"
 
 gen-test-handler-method:
-	gotests -only=$(ARG) -template_dir="util/test/templates/handler" -w "$(ARG)"
+	gotests -template_dir="util/test/templates/handler" -w -all "$(ARG)"
+
+# 全パッケージのテスト実施、カバレッジファイルの出力
+do-test: 
+	go test ./... -coverpkg=./... -coverprofile=coverage.out > test_report.txt
+
+# カバレッジファイルの表示
+coverage-test:
+	go tool cover -html=coverage.out -o coverage.html && open coverage.html
+
+test: do-test coverage-test

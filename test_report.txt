@@ -1,0 +1,12 @@
+?   	github.com/majikana-rinadehi/backend-manage-stock-go	[no test files]
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/docs	[no test files]
+ok  	github.com/majikana-rinadehi/backend-manage-stock-go/internal/repositories	0.406s	coverage: 22.7% of statements in ./...
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/pkg/adapters	[no test files]
+ok  	github.com/majikana-rinadehi/backend-manage-stock-go/pkg/adapters/handlers	0.388s	coverage: 33.8% of statements in ./...
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/pkg/entities	[no test files]
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces	[no test files]
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/handlers	[no test files]
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/usecases	[no test files]
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/pkg/usecases	[no test files]
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/util	[no test files]
+?   	github.com/majikana-rinadehi/backend-manage-stock-go/util/testUtil	[no test files]
