@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	_ "github.com/majikana-rinadehi/backend-manage-stock-go/docs"
+	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/entities"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/handlers"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/usecases"
 )
@@ -30,12 +31,16 @@ func NewStockCategoryHandler(uc usecases.StockCategoryUsecase) handlers.StockCat
 // @Failure 500
 // @Router /categories [get]
 func (h *StockCategoryHandler) GetAllCategories(c *gin.Context) *gin.Context {
-	stocks, err := h.stockCategoryUsecase.GetAllStockCategories()
+	categories, err := h.stockCategoryUsecase.GetAllStockCategories()
 	if err != nil {
 		fmt.Println("GetAllStocks failed", err)
 		c.JSON(http.StatusInternalServerError, gin.H{})
 		return c
 	}
-	c.JSON(http.StatusOK, stocks)
+	c.JSON(http.StatusOK, &handlers.Response[*entities.StockCategory]{
+		Total:   len(categories),
+		Results: categories,
+		Errors:  nil,
+	})
 	return c
 }
