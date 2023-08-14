@@ -82,27 +82,7 @@ func (h *StockHandler) CreateStock(c *gin.Context) *gin.Context {
 	}
 
 	// リクエストバリデーションチェック
-	vErr := validation.ValidateStruct(&newStock,
-		validation.Field(&newStock.Id,
-			validation.By(util.ValidateIntNotEmpty("id")),
-		),
-		validation.Field(&newStock.UserId,
-			validation.By(util.ValidateIntNotEmpty("userId")),
-		),
-		validation.Field(&newStock.CategoryId,
-			validation.By(util.ValidateIntNotEmpty("categoryId")),
-		),
-		validation.Field(&newStock.Name,
-			validation.By(util.ValidateStrNotEmpty("name")),
-			validation.Length(0, 255).Error(util.MaxLengthErrMsg("name", 255)),
-		),
-		validation.Field(&newStock.Amount,
-			validation.By(util.ValidateIntNotEmpty("amount")),
-		),
-		validation.Field(&newStock.ExpireDate,
-			validation.By(util.ValidateYYYY_MM_DD("expireDate")),
-		),
-	)
+	vErr := validateStock(newStock)
 
 	if vErr != nil {
 		handlers.BadRequests(c, vErr.(validation.Errors))
@@ -163,4 +143,84 @@ func (h *StockHandler) DeleteStock(c *gin.Context) *gin.Context {
 
 	c.Status(http.StatusNoContent)
 	return c
+}
+
+// UpdateStock
+// @Summary idで指定したStockを1件更新する
+// @Tags Stock
+// @Produce json
+// @Param id path string false "ID"
+// @Param body body entities.Stock false "Stock"
+// @Success 200
+// @Failure 400
+// @Failure 500
+// @Router /stocks/{id} [put]
+func (h *StockHandler) UpdateStock(c *gin.Context) *gin.Context {
+	id, _ := strconv.Atoi(c.Param("id"))
+	fmt.Println(id)
+
+	var newStock entities.Stock
+
+	if bindErr := c.BindJSON(&newStock); bindErr != nil {
+		c.JSON(http.StatusBadRequest, &handlers.Response[any]{
+			Total:   0,
+			Results: nil,
+			Errors: []*handlers.ErrorResponse{
+				{
+					Message: bindErr.Error(),
+				},
+			},
+		})
+		return c
+	}
+
+	updatedStock, err := h.stockUsecase.UpdateStock(id, &newStock)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, &handlers.Response[any]{
+			Total:   0,
+			Results: nil,
+			Errors: []*handlers.ErrorResponse{
+				{
+					Message: "UpdateStock failed",
+				},
+			},
+		})
+		return c
+	}
+
+	c.JSON(http.StatusOK, &handlers.Response[*entities.Stock]{
+		Total: 1,
+		Results: []*entities.Stock{
+			updatedStock,
+		},
+		Errors: nil,
+	})
+	return c
+}
+
+// validateStock validates Stock data in request body
+func validateStock(newStock entities.Stock) error {
+
+	// リクエストバリデーションチェック
+	vErr := validation.ValidateStruct(&newStock,
+		validation.Field(&newStock.UserId,
+			validation.By(util.ValidateIntNotEmpty("userId")),
+		),
+		validation.Field(&newStock.CategoryId,
+			validation.By(util.ValidateIntNotEmpty("categoryId")),
+		),
+		validation.Field(&newStock.Name,
+			validation.By(util.ValidateStrNotEmpty("name")),
+			validation.Length(0, 255).Error(util.MaxLengthErrMsg("name", 255)),
+		),
+		validation.Field(&newStock.Amount,
+			validation.By(util.ValidateIntNotEmpty("amount")),
+		),
+		validation.Field(&newStock.ExpireDate,
+			validation.By(util.ValidateYYYY_MM_DD("expireDate")),
+		),
+	)
+
+	return vErr
 }

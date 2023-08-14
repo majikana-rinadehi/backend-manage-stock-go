@@ -59,7 +59,7 @@
 				
 				<option value="file1">github.com/majikana-rinadehi/backend-manage-stock-go/internal/repositories/stock_category_repository.go (0.0%)</option>
 				
-				<option value="file2">github.com/majikana-rinadehi/backend-manage-stock-go/internal/repositories/stock_repository.go (63.2%)</option>
+				<option value="file2">github.com/majikana-rinadehi/backend-manage-stock-go/internal/repositories/stock_repository.go (37.5%)</option>
 				
 				<option value="file3">github.com/majikana-rinadehi/backend-manage-stock-go/internal/repositories/user_repository.go (0.0%)</option>
 				
@@ -69,7 +69,7 @@
 				
 				<option value="file6">github.com/majikana-rinadehi/backend-manage-stock-go/pkg/adapters/handlers/stock_category_handler.go (0.0%)</option>
 				
-				<option value="file7">github.com/majikana-rinadehi/backend-manage-stock-go/pkg/adapters/handlers/stock_handler.go (89.7%)</option>
+				<option value="file7">github.com/majikana-rinadehi/backend-manage-stock-go/pkg/adapters/handlers/stock_handler.go (65.1%)</option>
 				
 				<option value="file8">github.com/majikana-rinadehi/backend-manage-stock-go/pkg/adapters/handlers/user_handler.go (0.0%)</option>
 				
@@ -213,6 +213,42 @@ const docTemplate = `{
             }
         },
         "/stocks/{id}": {
+            "put": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Stock"
+                ],
+                "summary": "idで指定したStockを1件更新する",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID",
+                        "name": "id",
+                        "in": "path"
+                    },
+                    {
+                        "description": "Stock",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/entities.Stock"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
             "delete": {
                 "produces": [
                     "application/json"
@@ -448,6 +484,45 @@ func (r *StockRepository) DeleteById(id int) error <span class="cov8" title="1">
 
         <span class="cov8" title="1">return nil</span>
 }
+
+func (r *StockRepository) Update(id int, stock *entities.Stock) (*entities.Stock, error) <span class="cov0" title="0">{
+        db, dbErr := r.dbAdapter.GetDB()
+        if dbErr != nil </span><span class="cov0" title="0">{
+                return nil, dbErr
+        }</span>
+
+        <span class="cov0" title="0">if err := db.
+                Model(&amp;entities.Stock{}).
+                Where("id = ?", id).
+                Updates(map[string]any{
+                        "category_id": stock.CategoryId,
+                        "name":        stock.Name,
+                        "amount":      stock.Amount,
+                        "expire_date": stock.ExpireDate,
+                }).Error; err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">return stock, nil</span>
+}
+
+func (r *StockRepository) CountById(id int) (int64, error) <span class="cov0" title="0">{
+        db, dbErr := r.dbAdapter.GetDB()
+        if dbErr != nil </span><span class="cov0" title="0">{
+                return 0, dbErr
+        }</span>
+
+        <span class="cov0" title="0">var count int64
+
+        if err := db.
+                Model(&amp;entities.Stock{}).
+                Where("id = ?", id).
+                Count(&amp;count).Error; err != nil </span><span class="cov0" title="0">{
+                return 0, err
+        }</span>
+
+        <span class="cov0" title="0">return count, nil</span>
+}
 </pre>
 		
 		<pre class="file" id="file3" style="display: none">package repositories
@@ -535,7 +610,7 @@ func main() <span class="cov0" title="0">{
         router := gin.Default()
         // CORS設定
         config := cors.DefaultConfig()
-        config.AllowOrigins = []string{"http://localhost:5173"}
+        config.AllowOrigins = []string{"http://localhost:5173", "http://127.0.0.1:5173"}
         config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE"}
         router.Use(cors.New(config))
 
@@ -650,6 +725,7 @@ import (
         "github.com/gin-gonic/gin"
 
         _ "github.com/majikana-rinadehi/backend-manage-stock-go/docs"
+        "github.com/majikana-rinadehi/backend-manage-stock-go/pkg/entities"
         "github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/handlers"
         "github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/usecases"
 )
@@ -673,13 +749,17 @@ func NewStockCategoryHandler(uc usecases.StockCategoryUsecase) handlers.StockCat
 // @Failure 500
 // @Router /categories [get]
 func (h *StockCategoryHandler) GetAllCategories(c *gin.Context) *gin.Context <span class="cov0" title="0">{
-        stocks, err := h.stockCategoryUsecase.GetAllStockCategories()
+        categories, err := h.stockCategoryUsecase.GetAllStockCategories()
         if err != nil </span><span class="cov0" title="0">{
                 fmt.Println("GetAllStocks failed", err)
                 c.JSON(http.StatusInternalServerError, gin.H{})
                 return c
         }</span>
-        <span class="cov0" title="0">c.JSON(http.StatusOK, stocks)
+        <span class="cov0" title="0">c.JSON(http.StatusOK, &amp;handlers.Response[*entities.StockCategory]{
+                Total:   len(categories),
+                Results: categories,
+                Errors:  nil,
+        })
         return c</span>
 }
 </pre>
@@ -768,27 +848,7 @@ func (h *StockHandler) CreateStock(c *gin.Context) *gin.Context <span class="cov
         }</span>
 
         // リクエストバリデーションチェック
-        <span class="cov8" title="1">vErr := validation.ValidateStruct(&amp;newStock,
-                validation.Field(&amp;newStock.Id,
-                        validation.By(util.ValidateIntNotEmpty("id")),
-                ),
-                validation.Field(&amp;newStock.UserId,
-                        validation.By(util.ValidateIntNotEmpty("userId")),
-                ),
-                validation.Field(&amp;newStock.CategoryId,
-                        validation.By(util.ValidateIntNotEmpty("categoryId")),
-                ),
-                validation.Field(&amp;newStock.Name,
-                        validation.By(util.ValidateStrNotEmpty("name")),
-                        validation.Length(0, 255).Error(util.MaxLengthErrMsg("name", 255)),
-                ),
-                validation.Field(&amp;newStock.Amount,
-                        validation.By(util.ValidateIntNotEmpty("amount")),
-                ),
-                validation.Field(&amp;newStock.ExpireDate,
-                        validation.By(util.ValidateYYYY_MM_DD("expireDate")),
-                ),
-        )
+        <span class="cov8" title="1">vErr := validateStock(newStock)
 
         if vErr != nil </span><span class="cov8" title="1">{
                 handlers.BadRequests(c, vErr.(validation.Errors))
@@ -850,6 +910,86 @@ func (h *StockHandler) DeleteStock(c *gin.Context) *gin.Context <span class="cov
         <span class="cov8" title="1">c.Status(http.StatusNoContent)
         return c</span>
 }
+
+// UpdateStock
+// @Summary idで指定したStockを1件更新する
+// @Tags Stock
+// @Produce json
+// @Param id path string false "ID"
+// @Param body body entities.Stock false "Stock"
+// @Success 200
+// @Failure 400
+// @Failure 500
+// @Router /stocks/{id} [put]
+func (h *StockHandler) UpdateStock(c *gin.Context) *gin.Context <span class="cov0" title="0">{
+        id, _ := strconv.Atoi(c.Param("id"))
+        fmt.Println(id)
+
+        var newStock entities.Stock
+
+        if bindErr := c.BindJSON(&amp;newStock); bindErr != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusBadRequest, &amp;handlers.Response[any]{
+                        Total:   0,
+                        Results: nil,
+                        Errors: []*handlers.ErrorResponse{
+                                {
+                                        Message: bindErr.Error(),
+                                },
+                        },
+                })
+                return c
+        }</span>
+
+        <span class="cov0" title="0">updatedStock, err := h.stockUsecase.UpdateStock(id, &amp;newStock)
+
+        if err != nil </span><span class="cov0" title="0">{
+                c.JSON(http.StatusInternalServerError, &amp;handlers.Response[any]{
+                        Total:   0,
+                        Results: nil,
+                        Errors: []*handlers.ErrorResponse{
+                                {
+                                        Message: "UpdateStock failed",
+                                },
+                        },
+                })
+                return c
+        }</span>
+
+        <span class="cov0" title="0">c.JSON(http.StatusOK, &amp;handlers.Response[*entities.Stock]{
+                Total: 1,
+                Results: []*entities.Stock{
+                        updatedStock,
+                },
+                Errors: nil,
+        })
+        return c</span>
+}
+
+// validateStock validates Stock data in request body
+func validateStock(newStock entities.Stock) error <span class="cov8" title="1">{
+
+        // リクエストバリデーションチェック
+        vErr := validation.ValidateStruct(&amp;newStock,
+                validation.Field(&amp;newStock.UserId,
+                        validation.By(util.ValidateIntNotEmpty("userId")),
+                ),
+                validation.Field(&amp;newStock.CategoryId,
+                        validation.By(util.ValidateIntNotEmpty("categoryId")),
+                ),
+                validation.Field(&amp;newStock.Name,
+                        validation.By(util.ValidateStrNotEmpty("name")),
+                        validation.Length(0, 255).Error(util.MaxLengthErrMsg("name", 255)),
+                ),
+                validation.Field(&amp;newStock.Amount,
+                        validation.By(util.ValidateIntNotEmpty("amount")),
+                ),
+                validation.Field(&amp;newStock.ExpireDate,
+                        validation.By(util.ValidateYYYY_MM_DD("expireDate")),
+                ),
+        )
+
+        return vErr
+}</span>
 </pre>
 		
 		<pre class="file" id="file8" style="display: none">package handlers
@@ -932,6 +1072,9 @@ func (a *HTTPAdapter) SetupRoutes(router *gin.Engine) <span class="cov0" title="
         }</span>)
         <span class="cov0" title="0">router.DELETE("/stocks/:id", func(c *gin.Context) </span><span class="cov0" title="0">{
                 stockHandler.DeleteStock(c)
+        }</span>)
+        <span class="cov0" title="0">router.PUT("/stocks/:id", func(c *gin.Context) </span><span class="cov0" title="0">{
+                stockHandler.UpdateStock(c)
         }</span>)
         <span class="cov0" title="0">router.GET("/categories", func(c *gin.Context) </span><span class="cov0" title="0">{
                 stockCategoryHandler.GetAllCategories(c)
@@ -1107,7 +1250,9 @@ func (uc StockCategoryUsecase) GetAllStockCategories() ([]*entities.StockCategor
 		<pre class="file" id="file14" style="display: none">package usecases
 
 import (
+        "errors"
         "fmt"
+        "strconv"
 
         "github.com/majikana-rinadehi/backend-manage-stock-go/pkg/entities"
         "github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces"
@@ -1149,6 +1294,27 @@ func (uc StockUsecase) DeleteStock(stockId int) error <span class="cov0" title="
                 return err
         }</span>
         <span class="cov0" title="0">return nil</span>
+}
+
+func (uc StockUsecase) UpdateStock(id int, stock *entities.Stock) (*entities.Stock, error) <span class="cov0" title="0">{
+
+        count, err := uc.r.CountById(id)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Failed UpdateStock;", err)
+                return nil, err
+        }</span>
+
+        <span class="cov0" title="0">if count == 0 </span><span class="cov0" title="0">{
+                fmt.Println("Update target not found;")
+                return nil, errors.New("Not found: id = " + strconv.Itoa(id))
+        }</span>
+
+        <span class="cov0" title="0">stockUpdated, err := uc.r.Update(id, stock)
+        if err != nil </span><span class="cov0" title="0">{
+                fmt.Println("Failed UpdateStock;", err)
+                return nil, err
+        }</span>
+        <span class="cov0" title="0">return stockUpdated, nil</span>
 }
 </pre>
 		

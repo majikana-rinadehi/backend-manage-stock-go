@@ -6,4 +6,5 @@ type StockHandler interface {
 	GetAllStocks(c *gin.Context) *gin.Context
 	CreateStock(c *gin.Context) *gin.Context
 	DeleteStock(c *gin.Context) *gin.Context
+	UpdateStock(c *gin.Context) *gin.Context
 }

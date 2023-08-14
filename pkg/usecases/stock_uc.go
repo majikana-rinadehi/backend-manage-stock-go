@@ -1,7 +1,9 @@
 package usecases
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/entities"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces"
@@ -43,4 +45,25 @@ func (uc StockUsecase) DeleteStock(stockId int) error {
 		return err
 	}
 	return nil
+}
+
+func (uc StockUsecase) UpdateStock(id int, stock *entities.Stock) (*entities.Stock, error) {
+
+	count, err := uc.r.CountById(id)
+	if err != nil {
+		fmt.Println("Failed UpdateStock;", err)
+		return nil, err
+	}
+
+	if count == 0 {
+		fmt.Println("Update target not found;")
+		return nil, errors.New("Not found: id = " + strconv.Itoa(id))
+	}
+
+	stockUpdated, err := uc.r.Update(id, stock)
+	if err != nil {
+		fmt.Println("Failed UpdateStock;", err)
+		return nil, err
+	}
+	return stockUpdated, nil
 }

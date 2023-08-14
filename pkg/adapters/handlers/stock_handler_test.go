@@ -38,6 +38,11 @@ func (m *MockUsecase) DeleteStock(stockId int) error {
 	return args.Error(0)
 }
 
+func (m *MockUsecase) UpdateStock(stockId int, stock *entities.Stock) (*entities.Stock, error) {
+	args := m.Called()
+	return args.Get(0).(*entities.Stock), args.Error(1)
+}
+
 var mockStockList = []*entities.Stock{
 	{
 		Id:         1,
@@ -191,9 +196,6 @@ func TestStockHandler_CreateStock(t *testing.T) {
 				Total:   0,
 				Results: nil,
 				Errors: handlers.SortErrorResponse([]*handlers.ErrorResponse{
-					{
-						Message: util.RequiredErrMsg("id"),
-					},
 					{
 						Message: util.RequiredErrMsg("categoryId"),
 					},

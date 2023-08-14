@@ -36,6 +36,9 @@ func (a *HTTPAdapter) SetupRoutes(router *gin.Engine) {
 	router.DELETE("/stocks/:id", func(c *gin.Context) {
 		stockHandler.DeleteStock(c)
 	})
+	router.PUT("/stocks/:id", func(c *gin.Context) {
+		stockHandler.UpdateStock(c)
+	})
 	router.GET("/categories", func(c *gin.Context) {
 		stockCategoryHandler.GetAllCategories(c)
 	})

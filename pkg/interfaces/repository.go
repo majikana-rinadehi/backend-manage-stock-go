@@ -8,6 +8,8 @@ type StockRepository interface {
 	Save(stock *entities.Stock) (*entities.Stock, error)
 	FindAll() ([]*entities.Stock, error)
 	DeleteById(id int) error
+	Update(id int, stock *entities.Stock) (*entities.Stock, error)
+	CountById(id int) (int64, error)
 }
 
 type StockCategoryRepository interface {
