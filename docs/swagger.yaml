@@ -111,6 +111,29 @@ paths:
       summary: idで指定したStockを1件削除する
       tags:
       - Stock
+    put:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        type: string
+      - description: Stock
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.Stock'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: idで指定したStockを1件更新する
+      tags:
+      - Stock
   /users:
     get:
       produces:

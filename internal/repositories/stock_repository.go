@@ -58,3 +58,42 @@ func (r *StockRepository) DeleteById(id int) error {
 
 	return nil
 }
+
+func (r *StockRepository) Update(id int, stock *entities.Stock) (*entities.Stock, error) {
+	db, dbErr := r.dbAdapter.GetDB()
+	if dbErr != nil {
+		return nil, dbErr
+	}
+
+	if err := db.
+		Model(&entities.Stock{}).
+		Where("id = ?", id).
+		Updates(map[string]any{
+			"category_id": stock.CategoryId,
+			"name":        stock.Name,
+			"amount":      stock.Amount,
+			"expire_date": stock.ExpireDate,
+		}).Error; err != nil {
+		return nil, err
+	}
+
+	return stock, nil
+}
+
+func (r *StockRepository) CountById(id int) (int64, error) {
+	db, dbErr := r.dbAdapter.GetDB()
+	if dbErr != nil {
+		return 0, dbErr
+	}
+
+	var count int64
+
+	if err := db.
+		Model(&entities.Stock{}).
+		Where("id = ?", id).
+		Count(&count).Error; err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
