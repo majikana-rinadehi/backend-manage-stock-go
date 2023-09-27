@@ -68,3 +68,22 @@ func (r *UserRepository) SaveAuth(userAuth *entities.UserAuth) (*entities.UserAu
 
 	return userAuth, nil
 }
+
+func (r *UserRepository) UpdateUser(userId int, newUser *entities.User) error {
+	db, dbErr := r.dbAdapter.GetDB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	if err := db.
+		Model(&entities.User{}).
+		Where("id = ?", userId).
+		Updates(map[string]any{
+			"name":         newUser.Name,
+			"mail_address": newUser.MailAddress,
+		}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

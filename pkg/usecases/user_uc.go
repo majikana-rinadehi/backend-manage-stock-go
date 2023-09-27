@@ -65,3 +65,13 @@ func (uc UserUsecase) SignInWithProvider(userId int, authProvider string, uid st
 
 	return createdUser, nil
 }
+
+func (uc UserUsecase) UpdateUser(userId int, newUser *entities.User) error {
+
+	err := uc.r.UpdateUser(userId, newUser)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

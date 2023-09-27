@@ -21,4 +21,5 @@ type UserRepository interface {
 	Save(user *entities.User) (*entities.User, error)
 	SaveAuth(userAuth *entities.UserAuth) (*entities.UserAuth, error)
 	FindAll(userId int, authProvider string, uid string) ([]*entities.UserAuth, error)
+	UpdateUser(userId int, newUser *entities.User) error
 }

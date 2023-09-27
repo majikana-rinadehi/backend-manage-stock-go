@@ -49,4 +49,7 @@ func (a *HTTPAdapter) SetupRoutes(router *gin.Engine) {
 	router.POST("/auth/signin", func(c *gin.Context) {
 		authHandler.SignInWithProvider(c)
 	})
+	router.PUT("/users/:id", func(c *gin.Context) {
+		userHandler.PutUser(c)
+	})
 }

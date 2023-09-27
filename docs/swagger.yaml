@@ -198,4 +198,28 @@ paths:
       summary: 検索条件に合うUserを取得
       tags:
       - User
+  /users/{id}:
+    put:
+      parameters:
+      - description: id
+        in: path
+        name: id
+        type: string
+      - description: User
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.User'
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: userIdに対応するユーザの情報を更新する
+      tags:
+      - User
 swagger: "2.0"
