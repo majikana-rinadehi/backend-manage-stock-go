@@ -16,6 +16,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/auth/signin": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Providerによるサインインを実施する。新規ユーザの場合、ユーザ登録処理を実施する。",
+                "parameters": [
+                    {
+                        "description": "UserAuth",
+                        "name": "body",
+                        "in": "body",
+                        "schema": {
+                            "$ref": "#/definitions/entities.UserAuth"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/entities.User"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/categories": {
             "get": {
                 "produces": [
@@ -171,7 +209,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/users": {
+        "/user-auths": {
             "get": {
                 "produces": [
                     "application/json"
@@ -179,14 +217,34 @@ const docTemplate = `{
                 "tags": [
                     "User"
                 ],
-                "summary": "Userを全件取得",
+                "summary": "検索条件に合うUserを取得",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "userId",
+                        "name": "userId",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "authProvider",
+                        "name": "authProvider",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "uid",
+                        "name": "uid",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/entities.User"
+                                "$ref": "#/definitions/entities.UserAuth"
                             }
                         }
                     },
@@ -249,6 +307,20 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string"
+                }
+            }
+        },
+        "entities.UserAuth": {
+            "type": "object",
+            "properties": {
+                "authProvider": {
+                    "type": "string"
+                },
+                "uid": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "integer"
                 }
             }
         }

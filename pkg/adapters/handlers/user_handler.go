@@ -3,6 +3,7 @@ package handlers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -21,16 +22,27 @@ func NewUserHandler(uc usecases.UserUsecase) handlers.UserHandler {
 	}
 }
 
-// GetAllUsers
-// @Summary Userを全件取得
+// GetUserAuths
+// @Summary 検索条件に合うUserを取得
 // @Tags User
 // @Produce json
-// @Success 200 {array} entities.User
+// @Param userId query string false "userId"
+// @Param authProvider query string false "authProvider"
+// @Param uid query string false "uid"
+// @Success 200 {array} entities.UserAuth
 // @Failure 400
 // @Failure 500
-// @Router /users [get]
-func (h *UserHandler) GetAllUsers(c *gin.Context) *gin.Context {
-	users, err := h.stockUsecase.GetAllUsers()
+// @Router /user-auths [get]
+func (h *UserHandler) GetUserAuths(c *gin.Context) *gin.Context {
+
+	// user_id
+	// auth_provider
+	// uid
+	userId, _ := strconv.Atoi(c.Query("userId"))
+	authProvider := c.Query("authProvider")
+	uid := c.Query("uid")
+
+	users, err := h.stockUsecase.GetUserAuths(userId, authProvider, uid)
 	if err != nil {
 		fmt.Println("GetAllUsers failed", err)
 		c.JSON(http.StatusInternalServerError, gin.H{})

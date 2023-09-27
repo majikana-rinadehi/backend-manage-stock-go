@@ -16,28 +16,55 @@ func NewUserRepository(a *adapters.DatabaseAdapter) interfaces.UserRepository {
 	}
 }
 
-func (r *UserRepository) FindAll() (stocks []*entities.User, err error) {
+func (r *UserRepository) FindAll(userId int, authProvider string, uid string) (users []*entities.UserAuth, err error) {
 	db, dbErr := r.dbAdapter.GetDB()
 	if dbErr != nil {
 		return nil, dbErr
 	}
 
-	if err := db.Find(&stocks).Error; err != nil {
+	chain := db.Where("")
+
+	if userId != 0 {
+		chain.Where("user_id = ?", userId)
+	}
+
+	if authProvider != "" {
+		chain.Where("auth_provider = ?", authProvider)
+	}
+
+	if uid != "" {
+		chain.Where("uid = ?", uid)
+	}
+
+	if err := chain.Debug().Find(&users).Error; err != nil {
 		return nil, err
 	}
 
-	return stocks, nil
+	return users, nil
 }
 
-func (r *UserRepository) Save(stock *entities.User) (*entities.User, error) {
+func (r *UserRepository) Save(user *entities.User) (*entities.User, error) {
 	db, dbErr := r.dbAdapter.GetDB()
 	if dbErr != nil {
 		return nil, dbErr
 	}
 
-	if err := db.Create(&stock).Error; err != nil {
+	if err := db.Create(&user).Error; err != nil {
 		return nil, err
 	}
 
-	return stock, nil
+	return user, nil
+}
+
+func (r *UserRepository) SaveAuth(userAuth *entities.UserAuth) (*entities.UserAuth, error) {
+	db, dbErr := r.dbAdapter.GetDB()
+	if dbErr != nil {
+		return nil, dbErr
+	}
+
+	if err := db.Create(&userAuth).Error; err != nil {
+		return nil, err
+	}
+
+	return userAuth, nil
 }

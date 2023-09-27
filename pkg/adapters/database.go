@@ -23,6 +23,7 @@ func (a *DatabaseAdapter) Connect(isTest bool) error {
 	// データベースに接続する処理
 	dsn := a.GetDSN(isTest)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	// db.Logger = db.Logger.LogMode(logger.Info)
 	if err != nil {
 		return err
 	}

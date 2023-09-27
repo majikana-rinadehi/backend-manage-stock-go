@@ -25,6 +25,7 @@ func (a *HTTPAdapter) SetupRoutes(router *gin.Engine) {
 	stockHandler := handlers.NewStockHandler(a.stockUc)
 	stockCategoryHandler := handlers.NewStockCategoryHandler(a.stockCategoryUc)
 	userHandler := handlers.NewUserHandler(a.userUc)
+	authHandler := handlers.NewAuthHandler(a.userUc)
 
 	// router.GET() の第二引数のシグネチャに合わせるため、ハンドラー関数をラップします。
 	router.GET("/stocks", func(c *gin.Context) {
@@ -42,7 +43,10 @@ func (a *HTTPAdapter) SetupRoutes(router *gin.Engine) {
 	router.GET("/categories", func(c *gin.Context) {
 		stockCategoryHandler.GetAllCategories(c)
 	})
-	router.GET("/users", func(c *gin.Context) {
-		userHandler.GetAllUsers(c)
+	router.GET("/user-auths", func(c *gin.Context) {
+		userHandler.GetUserAuths(c)
+	})
+	router.POST("/auth/signin", func(c *gin.Context) {
+		authHandler.SignInWithProvider(c)
 	})
 }

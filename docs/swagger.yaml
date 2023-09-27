@@ -32,9 +32,42 @@ definitions:
       name:
         type: string
     type: object
+  entities.UserAuth:
+    properties:
+      authProvider:
+        type: string
+      uid:
+        type: string
+      userId:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
+  /auth/signin:
+    post:
+      parameters:
+      - description: UserAuth
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.UserAuth'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.User'
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Providerによるサインインを実施する。新規ユーザの場合、ユーザ登録処理を実施する。
+      tags:
+      - Auth
   /categories:
     get:
       produces:
@@ -134,8 +167,21 @@ paths:
       summary: idで指定したStockを1件更新する
       tags:
       - Stock
-  /users:
+  /user-auths:
     get:
+      parameters:
+      - description: userId
+        in: query
+        name: userId
+        type: string
+      - description: authProvider
+        in: query
+        name: authProvider
+        type: string
+      - description: uid
+        in: query
+        name: uid
+        type: string
       produces:
       - application/json
       responses:
@@ -143,13 +189,13 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/entities.User'
+              $ref: '#/definitions/entities.UserAuth'
             type: array
         "400":
           description: Bad Request
         "500":
           description: Internal Server Error
-      summary: Userを全件取得
+      summary: 検索条件に合うUserを取得
       tags:
       - User
 swagger: "2.0"

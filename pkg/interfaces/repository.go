@@ -18,6 +18,7 @@ type StockCategoryRepository interface {
 }
 
 type UserRepository interface {
-	Save(stock *entities.User) (*entities.User, error)
-	FindAll() ([]*entities.User, error)
+	Save(user *entities.User) (*entities.User, error)
+	SaveAuth(userAuth *entities.UserAuth) (*entities.UserAuth, error)
+	FindAll(userId int, authProvider string, uid string) ([]*entities.UserAuth, error)
 }
