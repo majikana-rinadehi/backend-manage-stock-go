@@ -19,7 +19,7 @@ func NewUserUsecase(r interfaces.UserRepository) usecases.UserUsecase {
 }
 
 func (uc UserUsecase) GetUserAuths(userId int, authProvider string, uid string) ([]*entities.UserAuth, error) {
-	userAuth, err := uc.r.FindAll(userId, authProvider, uid)
+	userAuth, err := uc.r.FindAuth(userId, authProvider, uid)
 	if err != nil {
 		fmt.Println("Failed GetAllUser; ", err)
 		return nil, err
@@ -29,16 +29,21 @@ func (uc UserUsecase) GetUserAuths(userId int, authProvider string, uid string) 
 
 func (uc UserUsecase) SignInWithProvider(userId int, authProvider string, uid string) (*entities.User, error) {
 
-	users, err := uc.GetUserAuths(userId, authProvider, uid)
+	userAuths, err := uc.GetUserAuths(userId, authProvider, uid)
 	if err != nil {
 		fmt.Println("GetAllUsers failed", err)
 		return nil, err
 	}
 
 	// すでにProviderに紐づくユーザが登録されていた場合
-	if len(users) > 0 {
+	if len(userAuths) > 0 {
 		fmt.Println("すでにユーザが登録されています")
-		return nil, nil
+		users, err := uc.r.Find(userAuths[0].UserId)
+		if err != nil {
+			fmt.Println("GetAllUsers failed", err)
+			return nil, err
+		}
+		return users[0], nil
 	}
 
 	newUser := &entities.User{

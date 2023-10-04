@@ -7,7 +7,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/go-ozzo/ozzo-validation/v4"
+	validation "github.com/go-ozzo/ozzo-validation/v4"
 	_ "github.com/majikana-rinadehi/backend-manage-stock-go/docs"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/entities"
 	"github.com/majikana-rinadehi/backend-manage-stock-go/pkg/interfaces/handlers"
@@ -25,16 +25,20 @@ func NewStockHandler(uc usecases.StockUsecase) handlers.StockHandler {
 	}
 }
 
-// GetAllStocks
-// @Summary Stockを全件取得
+// GetStocks
+// @Summary 条件に一致するStockを取得
 // @Tags Stock
 // @Produce json
+// @Param userId query string false "userId"
 // @Success 200 {array} entities.Stock
 // @Failure 400
 // @Failure 500
 // @Router /stocks [get]
-func (h *StockHandler) GetAllStocks(c *gin.Context) *gin.Context {
-	stocks, err := h.stockUsecase.GetAllStocks()
+func (h *StockHandler) GetStocks(c *gin.Context) *gin.Context {
+
+	userId, _ := strconv.Atoi(c.Query("userId"))
+
+	stocks, err := h.stockUsecase.GetStocks(userId)
 	if err != nil {
 		fmt.Println("GetAllStocks failed", err)
 		c.JSON(http.StatusInternalServerError, &handlers.Response[*entities.Stock]{

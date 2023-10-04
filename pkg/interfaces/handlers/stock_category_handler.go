@@ -5,5 +5,8 @@ import (
 )
 
 type StockCategoryHandler interface {
-	GetAllCategories(c *gin.Context) *gin.Context
+	GetCategories(c *gin.Context) *gin.Context
+	CreateCategory(c *gin.Context) *gin.Context
+	DeleteCategory(c *gin.Context) *gin.Context
+	UpdateCategory(c *gin.Context) *gin.Context
 }

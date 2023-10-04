@@ -1,7 +1,7 @@
 MIGRATION_DIR=./db/migrations
 
 run:
-	swag init && go mod tidy && go run .
+	swag init && go mod tidy && air -c .air.toml
 
 create-migration:
 	migrate create -ext sql -dir $(MIGRATION_DIR) -seq create_schema

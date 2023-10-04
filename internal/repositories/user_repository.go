@@ -16,7 +16,26 @@ func NewUserRepository(a *adapters.DatabaseAdapter) interfaces.UserRepository {
 	}
 }
 
-func (r *UserRepository) FindAll(userId int, authProvider string, uid string) (users []*entities.UserAuth, err error) {
+func (r *UserRepository) Find(userId int) (users []*entities.User, err error) {
+	db, dbErr := r.dbAdapter.GetDB()
+	if dbErr != nil {
+		return nil, dbErr
+	}
+
+	chain := db.Where("")
+
+	if userId != 0 {
+		chain.Where("id = ?", userId)
+	}
+
+	if err := chain.Debug().Find(&users).Error; err != nil {
+		return nil, err
+	}
+
+	return users, nil
+}
+
+func (r *UserRepository) FindAuth(userId int, authProvider string, uid string) (users []*entities.UserAuth, err error) {
 	db, dbErr := r.dbAdapter.GetDB()
 	if dbErr != nil {
 		return nil, dbErr

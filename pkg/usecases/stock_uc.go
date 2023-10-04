@@ -20,8 +20,8 @@ func NewStockUsecase(r interfaces.StockRepository) usecases.StockUsecase {
 	}
 }
 
-func (uc StockUsecase) GetAllStocks() ([]*entities.Stock, error) {
-	stocks, err := uc.r.FindAll()
+func (uc StockUsecase) GetStocks(userId int) ([]*entities.Stock, error) {
+	stocks, err := uc.r.FindByQuery(userId)
 	if err != nil {
 		fmt.Println("Failed GetAllStock; ", err)
 		return nil, err

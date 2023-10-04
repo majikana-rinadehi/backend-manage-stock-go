@@ -132,7 +132,7 @@ func TestStockHandler_GetAllStocks(t *testing.T) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 
-			got := h.GetAllStocks(c)
+			got := h.GetStocks(c)
 
 			// Assert status code
 			if !reflect.DeepEqual(got.Writer.Status(), tt.wantStatus) {

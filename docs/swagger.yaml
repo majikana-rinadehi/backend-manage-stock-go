@@ -70,6 +70,11 @@ paths:
       - Auth
   /categories:
     get:
+      parameters:
+      - description: userId
+        in: query
+        name: userId
+        type: string
       produces:
       - application/json
       responses:
@@ -83,11 +88,79 @@ paths:
           description: Bad Request
         "500":
           description: Internal Server Error
-      summary: Categoryを全件取得
+      summary: 条件に一致するCategoryを取得
+      tags:
+      - Category
+    post:
+      parameters:
+      - description: Category
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.StockCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登録したCategory
+          schema:
+            $ref: '#/definitions/entities.StockCategory'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Categoryを1件登録
+      tags:
+      - Category
+  /categories/{id}:
+    delete:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: idで指定したCategoryを1件削除する
+      tags:
+      - Category
+    put:
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        type: string
+      - description: Category
+        in: body
+        name: body
+        schema:
+          $ref: '#/definitions/entities.StockCategory'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: idで指定したCategoryを1件更新する
       tags:
       - Category
   /stocks:
     get:
+      parameters:
+      - description: userId
+        in: query
+        name: userId
+        type: string
       produces:
       - application/json
       responses:
@@ -101,7 +174,7 @@ paths:
           description: Bad Request
         "500":
           description: Internal Server Error
-      summary: Stockを全件取得
+      summary: 条件に一致するStockを取得
       tags:
       - Stock
     post:

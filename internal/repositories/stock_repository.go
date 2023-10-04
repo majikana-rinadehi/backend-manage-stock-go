@@ -30,6 +30,26 @@ func (r *StockRepository) FindAll() (stocks []*entities.Stock, err error) {
 	return stocks, nil
 }
 
+func (r *StockRepository) FindByQuery(userId int) (stocks []*entities.Stock, err error) {
+
+	db, dbErr := r.dbAdapter.GetDB()
+	if dbErr != nil {
+		return nil, dbErr
+	}
+
+	chain := db.Where("")
+
+	if userId != 0 {
+		chain.Where("user_id = ?", userId)
+	}
+
+	if err := chain.Debug().Find(&stocks).Error; err != nil {
+		return nil, err
+	}
+
+	return stocks, nil
+}
+
 func (r *StockRepository) Save(stock *entities.Stock) (*entities.Stock, error) {
 	db, dbErr := r.dbAdapter.GetDB()
 	if dbErr != nil {
