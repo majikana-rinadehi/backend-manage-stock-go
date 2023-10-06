@@ -167,7 +167,7 @@ const docTemplate = `{
                 "tags": [
                     "Category"
                 ],
-                "summary": "idで指定したCategoryを1件削除する",
+                "summary": "idで指定したCategoryを1件削除する。カテゴリに紐づくStockをすべて削除する。",
                 "parameters": [
                     {
                         "type": "string",

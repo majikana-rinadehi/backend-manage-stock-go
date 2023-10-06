@@ -109,7 +109,7 @@ func (h *StockCategoryHandler) CreateCategory(c *gin.Context) *gin.Context {
 }
 
 // DeleteCategory
-// @Summary idで指定したCategoryを1件削除する
+// @Summary idで指定したCategoryを1件削除する。カテゴリに紐づくStockをすべて削除する。
 // @Tags Category
 // @Produce json
 // @Param id path string false "ID"

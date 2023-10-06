@@ -11,17 +11,19 @@ import (
 )
 
 type StockCategoryUsecase struct {
-	r interfaces.StockCategoryRepository
+	rsc interfaces.StockCategoryRepository
+	rs  interfaces.StockRepository
 }
 
-func NewStockCategoryUsecase(r interfaces.StockCategoryRepository) usecases.StockCategoryUsecase {
+func NewStockCategoryUsecase(rsc interfaces.StockCategoryRepository, rs interfaces.StockRepository) usecases.StockCategoryUsecase {
 	return &StockCategoryUsecase{
-		r: r,
+		rsc: rsc,
+		rs:  rs,
 	}
 }
 
 func (uc StockCategoryUsecase) GetStockCategories(userId int) ([]*entities.StockCategory, error) {
-	stocks, err := uc.r.FindByQuery(userId)
+	stocks, err := uc.rsc.FindByQuery(userId)
 	if err != nil {
 		fmt.Println("Failed GetAllStockCategory; ", err)
 		return nil, err
@@ -30,7 +32,7 @@ func (uc StockCategoryUsecase) GetStockCategories(userId int) ([]*entities.Stock
 }
 
 func (uc StockCategoryUsecase) CreateCategory(category *entities.StockCategory) (*entities.StockCategory, error) {
-	category, err := uc.r.Save(category)
+	category, err := uc.rsc.Save(category)
 	if err != nil {
 		fmt.Println("Failed CreateCategory; ", err)
 		return nil, err
@@ -39,17 +41,25 @@ func (uc StockCategoryUsecase) CreateCategory(category *entities.StockCategory) 
 }
 
 func (uc StockCategoryUsecase) DeleteCategory(categoryId int) error {
-	err := uc.r.DeleteById(categoryId)
+	err := uc.rsc.DeleteById(categoryId)
 	if err != nil {
-		fmt.Println("Failed CreateCategory; ", err)
+		fmt.Println("Failed DeleteCategory; ", err)
 		return err
 	}
+
+	// カテゴリIDに紐づくStockをすべて削除する。
+	err2 := uc.rs.DeleteByCategoryId(categoryId)
+	if err2 != nil {
+		fmt.Println("Failed DeleteCategory; ", err2)
+		return err
+	}
+
 	return nil
 }
 
 func (uc StockCategoryUsecase) UpdateCategory(id int, category *entities.StockCategory) (*entities.StockCategory, error) {
 
-	count, err := uc.r.CountById(id)
+	count, err := uc.rsc.CountById(id)
 	if err != nil {
 		fmt.Println("Failed UpdateCategory;", err)
 		return nil, err
@@ -60,7 +70,7 @@ func (uc StockCategoryUsecase) UpdateCategory(id int, category *entities.StockCa
 		return nil, errors.New("Not found: id = " + strconv.Itoa(id))
 	}
 
-	categoryUpdated, err := uc.r.Update(id, category)
+	categoryUpdated, err := uc.rsc.Update(id, category)
 	if err != nil {
 		fmt.Println("Failed UpdateCategory;", err)
 		return nil, err

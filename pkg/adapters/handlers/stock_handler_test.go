@@ -28,6 +28,11 @@ func (m *MockUsecase) GetAllStocks() ([]*entities.Stock, error) {
 	return args.Get(0).([]*entities.Stock), args.Error(1)
 }
 
+func (m *MockUsecase) GetStocks(userId int) ([]*entities.Stock, error) {
+	args := m.Called()
+	return args.Get(0).([]*entities.Stock), args.Error(1)
+}
+
 func (m *MockUsecase) CreateStock(stock *entities.Stock) (*entities.Stock, error) {
 	args := m.Called()
 	return args.Get(0).(*entities.Stock), args.Error(1)

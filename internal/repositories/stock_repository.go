@@ -79,6 +79,22 @@ func (r *StockRepository) DeleteById(id int) error {
 	return nil
 }
 
+func (r *StockRepository) DeleteByCategoryId(categoryId int) error {
+	db, dbErr := r.dbAdapter.GetDB()
+	if dbErr != nil {
+		return dbErr
+	}
+
+	if err := db.
+		Clauses(clause.Returning{}).
+		Where("category_id = ?", categoryId).
+		Delete(&entities.Stock{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (r *StockRepository) Update(id int, stock *entities.Stock) (*entities.Stock, error) {
 	db, dbErr := r.dbAdapter.GetDB()
 	if dbErr != nil {

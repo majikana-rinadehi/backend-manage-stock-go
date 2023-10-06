@@ -29,7 +29,7 @@ func main() {
 
 	// ユースケースのセットアップ
 	stockUsecase := usecases.NewStockUsecase(stockRepository)
-	stockCategoryUsecase := usecases.NewStockCategoryUsecase(stockCategoryRepository)
+	stockCategoryUsecase := usecases.NewStockCategoryUsecase(stockCategoryRepository, stockRepository)
 	userUsecase := usecases.NewUserUsecase(userRepository)
 
 	// HTTPアダプターの作成

@@ -9,6 +9,7 @@ type StockRepository interface {
 	FindAll() ([]*entities.Stock, error)
 	FindByQuery(userId int) ([]*entities.Stock, error)
 	DeleteById(id int) error
+	DeleteByCategoryId(categoryId int) error
 	Update(id int, stock *entities.Stock) (*entities.Stock, error)
 	CountById(id int) (int64, error)
 }
