@@ -1,0 +1,33 @@
+services:
+  app:
+    container_name: app
+    build:
+      target: dev
+    volumes:
+      - ./:/app
+    environment:
+      - DBUSER:root
+      - DBPASS:root
+      - DBNAME:manage_stock
+      - DBHOST:db
+      - DBPORT:3306
+      - DBPORT_TEST:3307
+    tty: true
+    stdin_open: true
+    ports:
+      - 8080:8080
+  db:
+    image: mysql:8.0.33
+    container_name: db-manage-stock-go
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: manage_stock
+      TZ: "Asia/Tokyo"
+    volumes:
+      - db-manage-stock-go:/var/lib/mysql
+    ports:
+      - "3306:3306"
+      
+volumes:
+  db-manage-stock-go:
+
