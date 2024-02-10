@@ -2,9 +2,10 @@ services:
   app:
     container_name: app
     build:
+      context: .
       target: dev
     volumes:
-      - ./:/app
+      - ./:/workspace/app
     environment:
       - DBUSER:root
       - DBPASS:root
@@ -16,6 +17,7 @@ services:
     stdin_open: true
     ports:
       - 8080:8080
+    command: ["sleep", "infinity"]
   db:
     image: mysql:8.0.33
     container_name: db-manage-stock-go
@@ -27,6 +29,7 @@ services:
       - db-manage-stock-go:/var/lib/mysql
     ports:
       - "3306:3306"
+    command: ["sleep", "infinity"]
       
 volumes:
   db-manage-stock-go:

@@ -26,5 +26,11 @@ WORKDIR /app
 
 RUN go install github.com/cosmtrek/air@latest
 RUN go install github.com/swaggo/swag/cmd/swag@v1.8.7
+RUN go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
+# TODO: devcontainerで共通的に使うので、別の共通dockerfileとかにまとめたいよね。。。開発用のツールとかは
+RUN apt-get update && apt-get install -y sudo
+RUN sudo apt-get update && sudo apt-get install vim -y
+
 
 COPY . .

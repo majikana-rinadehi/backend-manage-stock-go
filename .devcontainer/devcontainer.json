@@ -1,0 +1,25 @@
+{
+	"name": "devcontainer",
+    "workspaceFolder": "/workspace/app",
+	"service": "app",
+	"runServices": [
+		"app",
+		"db"
+	],
+    "dockerComposeFile": [
+        "../docker-compose.yaml"
+    ],
+	"remoteEnv": {
+		"EDITOR": "vim"
+	},
+	"customizations": {
+		"vscode": {	
+			"settings": { 
+				"terminal.integrated.cwd": "/workspace/app"
+			},
+			"extensions": [
+				"ms-azuretools.vscode-docker"
+			]
+		}
+	}
+}
