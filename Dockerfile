@@ -24,9 +24,12 @@ FROM golang:1.19.2 AS dev
 
 WORKDIR /app
 
+RUN echo "running dev stage"
+
 RUN go install github.com/cosmtrek/air@latest
 RUN go install github.com/swaggo/swag/cmd/swag@v1.8.7
 RUN go install -tags 'mysql' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+RUN go install -v golang.org/x/tools/gopls@latest
 
 # TODO: devcontainerで共通的に使うので、別の共通dockerfileとかにまとめたいよね。。。開発用のツールとかは
 RUN apt-get update && apt-get install -y sudo
